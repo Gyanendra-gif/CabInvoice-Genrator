@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace CabInvoiceGenrator
@@ -12,12 +13,7 @@ namespace CabInvoiceGenrator
         readonly private double time;
         readonly private double distance;
 
-        public InvoiceGenerator (double runningDistance, double runningTime) 
-        {
-            this.distance = runningDistance;
-            this.time = runningTime;
-        }
-        public double CalculateFare() 
+        public double CalculateFare(double distance, double time) 
         {
             double totalFare = (distance * COSTPERKM) + (time * COSTPERMIN);
             if (totalFare < MINFARE)
@@ -26,6 +22,24 @@ namespace CabInvoiceGenrator
             }
             return totalFare;
         }
+        public double CalculateMultipleRideFare(MultipleRide[] multipleRide) 
+        {
+            double totalFare = 0;
+            foreach (var data in multipleRide)
+            {
+                totalFare += this.CalculateFare(data.distance, data.time);
+            }
+            return totalFare;
+        }
+        public InvoiceSummery CalculateInvoiceSummery(MultipleRide[] multipleRide)
+        {
+            double totalFare = this.CalculateMultipleRideFare(multipleRide);
+            InvoiceSummery summery = new InvoiceSummery();
+            summery.totalFare = totalFare;
+            summery.totalNumberOfRides = multipleRide.Count();
+            summery.CalulateAverageFare();
+            return summery;
 
+        }
     }
 }
